@@ -49,7 +49,7 @@ jobs:
         run: |
           git config user.name "anbudslaget-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/last-run.log
+          git add data/last-run.log data/ted-supported-fields.txt 2>/dev/null; git add data/last-run.log
           git commit -m "Felrapport $(date -u +%Y-%m-%dT%H:%M)" && git push
 
       - name: Spara ändringar

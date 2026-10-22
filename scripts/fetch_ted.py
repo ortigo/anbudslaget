@@ -109,13 +109,14 @@ def search(query, fields):
                 msg = e.read().decode("utf-8", "replace")
                 if e.code == 400:
                     log(f"  TED 400: {msg[:400]}{'…' if len(msg) > 400 else ''}")
-                    mentioned = [f for f in fields if re.search(r"(?<![\w-])" + re.escape(f) + r"(?![\w-])", msg)]
-                    # Långt svar som nämner de flesta fälten = TED listar tillåtna värden;
-                    # då är det de fält som INTE nämns som är ogiltiga.
-                    if len(mentioned) > len(fields) / 2:
-                        bad = [f for f in fields if f not in mentioned]
+                    m = re.search(r"supported values are:\s*([^)]*)\)", msg)
+                    if m:
+                        supported = {x.strip() for x in m.group(1).split(",")}
+                        (DATA / "ted-supported-fields.txt").parent.mkdir(parents=True, exist_ok=True)
+                        (DATA / "ted-supported-fields.txt").write_text("\n".join(sorted(supported)), "utf-8")
+                        bad = [f for f in fields if f not in supported]
                     else:
-                        bad = mentioned
+                        bad = [f for f in fields if re.search(r"(?<![\w-])" + re.escape(f) + r"(?![\w-])", msg)]
                     if bad and len(bad) < len(fields):
                         log(f"  TED känner inte igen fält {bad}; tar bort och försöker igen")
                         fields[:] = [f for f in fields if f not in bad]
