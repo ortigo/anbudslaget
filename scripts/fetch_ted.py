@@ -42,7 +42,8 @@ FIELDS = [
     "buyer-city",
     "place-of-performance",
     "place-of-performance-subdiv-lot",
-    "organisation-nuts-buyer",
+    "buyer-country-sub",
+    "organisation-country-sub-buyer",
     "classification-cpv",
     "main-classification-proc",
     "deadline-receipt-tender-date-lot",
@@ -58,7 +59,6 @@ FIELDS = [
     "winner-name",
     "winner-identifier",
     "organisation-identifier-tenderer",
-    "received-submissions-count",
     "received-submissions-type-val",
     "contract-conclusion-date",
     "description-proc",
@@ -223,7 +223,7 @@ def find_nuts(n):
         elif isinstance(x, str):
             for m in re.findall(r"\bSE\d{3}\b", x):
                 codes.add(m)
-    for k in ("place-of-performance-subdiv-lot", "place-of-performance", "organisation-nuts-buyer"):
+    for k in ("place-of-performance-subdiv-lot", "place-of-performance", "buyer-country-sub", "organisation-country-sub-buyer"):
         walk(n.get(k))
     return sorted(c for c in codes if c in LAN)
 
