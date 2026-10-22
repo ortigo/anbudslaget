@@ -63,7 +63,7 @@
     return `${dd} ${MONTH[m - 1]}${showY ? " " + y : ""}`;
   }
   function money(v, cur) {
-    if (v == null || !isFinite(v)) return "";
+    if (v == null || !isFinite(v) || v < 100) return "";
     const c = cur && cur !== "SEK" ? " " + cur : "";
     const f = (x, dec) => x.toLocaleString("sv-SE", { maximumFractionDigits: dec });
     if (v >= 1e9) return f(v / 1e9, 1) + " mdkr" + c;
