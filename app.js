@@ -104,7 +104,7 @@
   const rows = (list, empty) => list.length ? `<ol class="rows">${list.map(row).join("")}</ol>` : `<div class="empty">${empty}</div>`;
 
   function noData() {
-    return `<div class="empty"><h2>Ingen data ännu</h2><p>Första importen från TED har inte körts. Gå till fliken <b>Actions</b> i GitHub-repot, välj <b>Uppdatera data</b> och klicka <b>Run workflow</b>. Det tar några minuter första gången.</p></div>`;
+    return `<div class="empty"><h2>Kunde inte läsa in data</h2><p>Sajten uppdateras troligen just nu. Vänta en minut och <a href="" onclick="location.reload();return false">ladda om sidan</a>. Kvarstår det har den dagliga importen från TED inte gått igenom; se fliken <b>Actions</b> i GitHub-repot.</p></div>`;
   }
 
   // ---------- vyer ----------
