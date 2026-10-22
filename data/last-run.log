@@ -1,5 +1,0 @@
-Första körningen: hämtar från 2025-10-01
-Hämtar 2025-10-01 – 2025-10-10
-  TED känner inte igen fält ['publication-number', 'publication-date', 'notice-type', 'form-type', 'notice-title', 'title-proc', 'buyer-name', 'buyer-country', 'organisation-identifier-buyer', 'buyer-city', 'place-of-performance', 'place-of-performance-subdiv-lot', 'organisation-nuts-buyer', 'classification-cpv', 'main-classification-proc', 'deadline-receipt-tender-date-lot', 'deadline-receipt-request', 'estimated-value-proc', 'estimated-value-cur-proc', 'estimated-value-lot', 'estimated-value-cur-lot', 'total-value', 'total-value-cur', 'tender-value', 'tender-value-cur', 'winner-name', 'winner-identifier', 'organisation-identifier-tenderer', 'received-submissions-type-val', 'contract-conclusion-date', 'description-proc']; tar bort och försöker igen
-  TED känner inte igen fält ['received-submissions-count']; tar bort och försöker igen
-TED svarade 400: {"message":"Validation error","error":[{"objectName":"publicExpertSearchRequestV1","field":"fields","message":"must not be empty"}]}
