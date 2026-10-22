@@ -5,6 +5,7 @@
   {"name": "Risk, kris och beredskap", "terms": ["risk- och sårbarhetsanalys", "riskanalys", "krisberedskap", "kontinuitetshantering", "krisledning", "beredskapsplanering"]},
   {"name": "Totalförsvar och civilt försvar", "terms": ["civilt försvar", "totalförsvar", "höjd beredskap", "skydd mot påverkan", "psykologiskt försvar"]},
   {"name": "Underrättelse och omvärldsanalys", "terms": ["underrättelse", "omvärldsanalys", "omvärldsbevakning", "osint", "hotbild"]},
-  {"name": "Utbildning och övning", "terms": ["krisövning", "övningsledning", "säkerhetsutbildning", "utbildning i säkerhet", "spelövning"]},
-  {"name": "Konsultförsörjning", "terms": ["konsultförsörjning", "managementkonsult", "it-konsult", "verksamhetskonsult", "ramavtal konsult", "it-konsulter", "konsulttjänster it", "it-tjänster konsult"], "cpv": ["7941", "7222"]}
+  {"name": "Utbildning och övning", "terms": ["krisövning", "övningsledning", "säkerhetsutbildning", "utbildning i säkerhet", "spelövning", "krisledningsövning", "scenarioövning", "table top", "tabletop", "beredskapsövning", "ledningsövning"]},
+  {"name": "Konsultförsörjning", "terms": ["konsultförsörjning", "managementkonsult", "it-konsult", "verksamhetskonsult", "ramavtal konsult", "it-konsulter", "konsulttjänster it", "it-tjänster konsult"], "cpv": ["7941", "7222"]},
+  {"name": "Ledarskap och coaching", "terms": ["ledarskap", "ledarutveckling", "ledarskapsutbildning", "chefsträning", "chefsutveckling", "chefsutbildning", "chefsstöd", "coaching", "coach", "mentorskap", "coachning"]}
 ]
