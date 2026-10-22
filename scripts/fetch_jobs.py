@@ -34,7 +34,7 @@ CATEGORIES = {
 }
 PUBLIC_HINTS = ("kommun", "region ", "regionen", "myndighet", "verket", "länsstyrelsen", "försäkringskassan",
                 "polismyndigheten", "försvarsmakten", "universitet", "högskola", "domstol", "riksdag",
-                "kammarkollegiet", "inspektionen", "styrelsen", "landsting", "kommunalförbund", "räddningstjänst")
+                "kammarkollegiet", "kriminalvård", "tullverket", "kustbevakning", "skatteverket", "inspektionen", "styrelsen", "landsting", "kommunalförbund", "räddningstjänst")
 
 
 def log(*a):
@@ -103,7 +103,7 @@ def normalize(hit, cats):
         "e": emp,
         "eo": on,
         "ek": slug(emp),
-        "pub": 1 if any(h in name_l for h in PUBLIC_HINTS) else 0,
+        "pub": 1 if (on and on.startswith("2")) or any(h in name_l for h in PUBLIC_HINTS) or re.search(r"verk(et)?\b|^statens ", name_l) else 0,
         "cat": cats,
         "l": g(hit, "workplace_address", "region"),
         "m": g(hit, "workplace_address", "municipality"),
