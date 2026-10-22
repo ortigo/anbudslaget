@@ -256,7 +256,7 @@
     const res = items.filter(n => n.r);
     return `<section><span class="eyebrow">Köpare${b && b.o ? ` · <span class="mono">${esc(b.o)}</span>` : ""}</span><h1>${esc(name)}</h1>
       <div class="stats"><div><b>${open.length}</b><span>öppna nu</span></div><div><b>${res.length}</b><span>avgjorda i arkivet</span></div><div><b>${b && b.avgBids != null ? b.avgBids : "–"}</b><span>anbud i snitt</span></div><div><b>${esc(money(b && b.val)) || "–"}</b><span>tilldelat värde</span></div></div></section>
-      ${b && b.topWin && b.topWin.length ? `<section><h2>Vinner oftast här</h2><div class="table-wrap"><table><tbody>${b.topWin.map(([k, c]) => `<tr><td><a href="#/l/${encodeURIComponent(k)}">${esc(sName(k))}</a></td><td class="n">${c} vinster</td></tr>`).join("")}</tbody></table></div></section>` : ""}
+      ${b && b.topWin && b.topWin.length ? `<section><h2>Vinner oftast här</h2><div class="table-wrap"><table><tbody>${b.topWin.map(([k, c]) => `<tr><td><a href="#/l/${encodeURIComponent(k)}">${esc(sName(k))}</a></td><td class="n">${c} ${c === 1 ? "vinst" : "vinster"}</td></tr>`).join("")}</tbody></table></div></section>` : ""}
       <section><h2>Öppna upphandlingar</h2>${rows(open, "Inga öppna upphandlingar just nu.")}</section>
       <section><h2>Avgjorda</h2>${rows(res.slice(0, 40), "Inga avgjorda i arkivet.")}</section>`;
   }
@@ -282,7 +282,7 @@
     const bName = k => (buyers.find(b => b.k === k) || {}).n || k;
     return `<section><span class="eyebrow">Leverantör${s && s.o ? ` · <span class="mono">${esc(s.o)}</span>` : ""}</span><h1>${esc(name)}</h1>
       <div class="stats"><div><b>${wins.length}</b><span>vinster i arkivet</span></div><div><b>${s && s.avgBids != null ? s.avgBids : "–"}</b><span>anbud i snitt där de vann</span></div><div><b>${esc(money(s && s.val)) || "–"}</b><span>värde (delat vid flera vinnare)</span></div><div><b>${fdate(s && s.last)}</b><span>senaste vinst</span></div></div></section>
-      ${s && s.topBuyers && s.topBuyers.length ? `<section><h2>Största kunder</h2><div class="table-wrap"><table><tbody>${s.topBuyers.map(([k, c]) => `<tr><td><a href="#/k/${encodeURIComponent(k)}">${esc(bName(k))}</a></td><td class="n">${c} vinster</td></tr>`).join("")}</tbody></table></div></section>` : ""}
+      ${s && s.topBuyers && s.topBuyers.length ? `<section><h2>Största kunder</h2><div class="table-wrap"><table><tbody>${s.topBuyers.map(([k, c]) => `<tr><td><a href="#/k/${encodeURIComponent(k)}">${esc(bName(k))}</a></td><td class="n">${c} ${c === 1 ? "vinst" : "vinster"}</td></tr>`).join("")}</tbody></table></div></section>` : ""}
       <section><h2>Vunna upphandlingar</h2>${rows(wins.slice(0, 60), "Inga vinster i arkivet.")}</section>`;
   }
 
@@ -346,6 +346,15 @@
     const gen = t.endsWith("s") ? t : t + "s";
     return [t + "-kommun", gen + "-kommun", t + "-stad", gen + "-stad", "kommunstyrelsen-i-" + t];
   }
+  function muniName(m, buyers) {
+    if (m.ty === "L") return m.t;
+    const STAD = { "Malmö": "Malmö stad", "Göteborg": "Göteborgs stad", "Stockholm": "Stockholms stad", "Helsingborg": "Helsingborgs stad", "Landskrona": "Landskrona stad", "Solna": "Solna stad", "Sundbyberg": "Sundbybergs stad", "Vaxholm": "Vaxholms stad" };
+    if (STAD[m.t]) return STAD[m.t];
+    const keys = orgKeys(m);
+    const exact = (buyers || []).filter(b => keys.includes(b.k)).sort((a, b) => (b.open * 10 + b.res) - (a.open * 10 + a.res))[0];
+    if (exact && !/[,–-]/.test(exact.n)) return exact.n.replace(/\bKommun\b/, "kommun").replace(/\bStad\b/, "stad");
+    return /[aeiouyåäö]$/i.test(m.t) || /[sxz]$/i.test(m.t) ? m.t + " kommun" : m.t + "s kommun";
+  }
   const matchesOrg = (key, keys) => !!key && keys.some(k => key === k || key.startsWith(k + "-"));
   function fmtKpi(v, title) {
     if (v == null) return "–";
@@ -358,7 +367,7 @@
     const k = await load("kolada");
     if (!k || !k.munis) return `<section><h1>Kundkort</h1><div class="empty">Nyckeltal från Kolada hämtas vid nästa morgonkörning.</div></section>`;
     const q = (p.get("q") || "").toLowerCase(), lan = p.get("lan") || "Skåne län", ty = p.get("ty") || "";
-    const [open, jobs] = await Promise.all([load("open"), load("jobs")]);
+    const [open, jobs, buyers] = await Promise.all([load("open"), load("jobs"), load("buyers")]);
     const list = k.munis.filter(m => m.id !== "0000" && (!lan || lan === "alla" || muniLan(m) === lan) && (!ty || m.ty === ty) && (!q || m.t.toLowerCase().includes(q)));
     const opt = (v, cur, label) => `<option value="${esc(v)}"${v === cur ? " selected" : ""}>${esc(label)}</option>`;
     const rowsH = list.map(m => {
@@ -366,7 +375,7 @@
       const o = open.filter(n => matchesOrg(n.bk, keys)).length;
       const j = jobs.filter(x => x.open && matchesOrg(x.ek, keys)).length;
       const inv = ((k.values[m.id] || {}).N01951 || []).slice(-1)[0];
-      return `<tr><td><a href="#/kort/${m.id}">${esc(m.ty === "L" ? m.t : m.t + " kommun")}</a></td><td class="n">${inv ? n0(inv[1]) : ""}</td><td class="n">${o || ""}</td><td class="n">${j || ""}</td></tr>`;
+      return `<tr><td><a href="#/kort/${m.id}">${esc(muniName(m, buyers))}</a></td><td class="n">${inv ? n0(inv[1]) : ""}</td><td class="n">${o || ""}</td><td class="n">${j || ""}</td></tr>`;
     }).join("");
     return `<section><span class="eyebrow">Kolada · TED · Platsbanken</span><h1>Kundkort</h1>
       <p class="lead">En sida per kommun och region med nyckeltal, upphandlingar, vinnare och pågående rekryteringar. Underlag inför möten.</p>
@@ -382,7 +391,7 @@
     const [k, open, buyers, suppliers, jobs, all] = await Promise.all([load("kolada"), load("open"), load("buyers"), load("suppliers"), load("jobs"), archive()]);
     const m = k && k.munis && k.munis.find(x => x.id === id);
     if (!m) return `<div class="empty">Hittar inte kommunen eller regionen.</div>`;
-    const name = m.ty === "L" ? m.t : m.t + " kommun";
+    const name = muniName(m, buyers);
     const keys = orgKeys(m);
     const vals = k.values[m.id] || {}, riket = k.values["0000"] || {};
     const kpiRows = (k.kpis[m.ty] || []).filter(kid => k.meta[kid]).map(kid => {
@@ -409,7 +418,7 @@
       <section><h2>Nyckeltal</h2><div class="table-wrap"><table><thead><tr><th>Mått</th><th class="n">Värde</th><th class="n">År</th><th class="n">Riket</th></tr></thead><tbody>${kpiRows || `<tr><td colspan="4" class="muted">Inga nyckeltal hämtade.</td></tr>`}</tbody></table></div>
         <p class="note">Källa: Kolada (RKA). Pilen visar förändring mot föregående år. Hämtat ${esc((k.updatedAt || "").slice(0, 10))}.</p></section>
       ${sig.length ? `<section><h2>Rekryterar inom säkerhet och beredskap</h2><ol class="rows">${sig.slice(0, 10).map(j => `<li><a class="row-t" href="${esc(j.u)}" target="_blank" rel="noopener">${esc(j.t)}</a><div class="row-side">${j.open ? "" : `<span class="stamp done">Avslutad</span>`}</div><div class="row-meta"><span>${esc(j.e)}</span><span>${esc(j.cat.join(", "))}</span><span>publ. ${fdate(j.p || j.first)}</span></div></li>`).join("")}</ol></section>` : ""}
-      ${topW.length ? `<section><h2>Vinner oftast här</h2><div class="table-wrap"><table><tbody>${topW.map(([key, w]) => `<tr><td><a href="#/l/${encodeURIComponent(key)}">${esc(w.n)}</a></td><td class="n">${w.c} vinster</td></tr>`).join("")}</tbody></table></div></section>` : ""}
+      ${topW.length ? `<section><h2>Vinner oftast här</h2><div class="table-wrap"><table><tbody>${topW.map(([key, w]) => `<tr><td><a href="#/l/${encodeURIComponent(key)}">${esc(w.n)}</a></td><td class="n">${w.c} ${w.c === 1 ? "vinst" : "vinster"}</td></tr>`).join("")}</tbody></table></div></section>` : ""}
       <section><h2>Öppna upphandlingar</h2>${rows(openN, "Inga öppna upphandlingar i TED just nu.")}</section>
       <section><h2>Senast avgjorda</h2>${rows(res.slice(0, 12), "Inga avgjorda upphandlingar i arkivet.")}</section>
       ${units.length > 1 ? `<section><h2>Köparenheter</h2><div class="chips">${units.map(b => `<a class="chip" href="#/k/${encodeURIComponent(b.k)}">${esc(b.n)}</a>`).join("")}</div></section>` : ""}

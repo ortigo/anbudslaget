@@ -100,7 +100,10 @@ def main():
     for kid in [k for k in ids if k in meta]:
         rows = get_all(f"{API}/data/kpi/{kid}/year/{years}")
         per = {}
+        keep = {m["id"] for m in munis} | {"0000"}
         for r in rows:
+            if r.get("municipality") not in keep:
+                continue
             v = total(r)
             if v is None:
                 continue
