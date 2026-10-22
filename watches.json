@@ -1,0 +1,9 @@
+[
+  {"name": "Informations- och cybersäkerhet", "terms": ["informationssäkerhet", "cybersäkerhet", "it-säkerhet", "säkerhetstest", "penetrationstest", "security operations center", "nis2", "iso 27001", "ledningssystem för informationssäkerhet"]},
+  {"name": "Säkerhetsskydd", "terms": ["säkerhetsskydd", "säkerhetsskyddsanalys", "säkerhetsskyddad upphandling", "skyddsvärd"]},
+  {"name": "Risk, kris och beredskap", "terms": ["risk- och sårbarhetsanalys", "riskanalys", "krisberedskap", "kontinuitetshantering", "krisledning", "beredskapsplanering"]},
+  {"name": "Totalförsvar och civilt försvar", "terms": ["civilt försvar", "totalförsvar", "höjd beredskap", "skydd mot påverkan", "psykologiskt försvar"]},
+  {"name": "Underrättelse och omvärldsanalys", "terms": ["underrättelse", "omvärldsanalys", "omvärldsbevakning", "osint", "hotbild"]},
+  {"name": "Utbildning och övning", "terms": ["krisövning", "övningsledning", "säkerhetsutbildning", "utbildning i säkerhet", "spelövning"]},
+  {"name": "Konsultförsörjning", "terms": ["konsultförsörjning", "managementkonsult", "it-konsult", "verksamhetskonsult", "ramavtal konsult"], "cpv": ["7941", "7222"]}
+]
