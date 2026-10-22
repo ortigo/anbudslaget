@@ -1,7 +1,5 @@
 Första körningen: hämtar från 2025-10-01
 Hämtar 2025-10-01 – 2025-10-10
-  TED 400: {"message":"Parameter 'fields' contains unsupported value (supported values are: sme-part,touchpoint-gateway-ted-esen,submission-url-lot,organisation-person-addinfo-part,no-negocaition-necessary-lot,BT-13(t)-Part,organisation-city-serv-prov,result-framework-maximum-value-cur-notice,BT-821-Lot,touchpoint-partname-tenderer,touchpoint-internet-address-paying,BT-805-Lot,touchpoint-post-code-addinfo-lo…
-  TED känner inte igen fält ['organisation-nuts-buyer', 'received-submissions-count']; tar bort och försöker igen
 Hämtar 2025-10-11 – 2025-10-20
 Hämtar 2025-10-21 – 2025-10-30
 Hämtar 2025-10-31 – 2025-11-09
@@ -40,4 +38,4 @@ Hämtar 2026-09-16 – 2026-09-25
 Hämtar 2026-09-26 – 2026-10-05
 Hämtar 2026-10-06 – 2026-10-15
 Hämtar 2026-10-16 – 2026-10-22
-Klart: 25076 nya, 25076 totalt, 1711 öppna. Borttagna fält: ['organisation-nuts-buyer', 'received-submissions-count']
+Klart: 25076 nya, 25076 totalt, 1711 öppna. Borttagna fält: inga
