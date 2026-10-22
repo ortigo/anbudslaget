@@ -109,7 +109,7 @@ def search(query, fields):
                 msg = e.read().decode("utf-8", "replace")
                 if e.code == 400:
                     log(f"  TED 400: {msg[:400]}{'…' if len(msg) > 400 else ''}")
-                    m = re.search(r"supported values are:\s*([^)]*)\)", msg)
+                    m = re.search(r"supported values are:\s*(.*)\)", msg)
                     if m:
                         supported = {x.strip() for x in m.group(1).split(",")}
                         (DATA / "ted-supported-fields.txt").parent.mkdir(parents=True, exist_ok=True)
