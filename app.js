@@ -122,7 +122,7 @@
         <span class="eyebrow">Offentlig upphandling i Sverige</span>
         <h1>Vad som är ute just nu, och vem som vinner.</h1>
         ${searchBar("")}
-        <div class="chips">${["informationssäkerhet","säkerhetsskydd","krisberedskap","IT-konsult","utbildning","riskanalys"].map(t => `<a class="chip" href="#/sok?q=${encodeURIComponent(t)}">${esc(t)}</a>`).join("")}</div>
+        <div class="chips">${["informationssäkerhet","cybersäkerhet","dataskydd","säkerhetsskydd","krisberedskap","IT-konsult","riskanalys"].map(t => `<a class="chip" href="#/sok?q=${encodeURIComponent(t)}">${esc(t)}</a>`).join("")}</div>
       </section>
       <div class="stats" role="list">
         <div role="listitem"><b>${n0(c.open)}</b><span>öppna upphandlingar</span></div>
