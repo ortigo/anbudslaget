@@ -286,6 +286,56 @@
       <section><h2>Vunna upphandlingar</h2>${rows(wins.slice(0, 60), "Inga vinster i arkivet.")}</section>`;
   }
 
+  // ---------- signaler (rekryteringar från Platsbanken) ----------
+  async function viewSignals(p) {
+    const [jobs, jmeta, buyers, open] = await Promise.all([load("jobs"), load("jobs-meta"), load("buyers"), load("open")]);
+    if (!jobs.length) return `<section><h1>Signaler</h1><div class="empty">Inga rekryteringssignaler ännu. De hämtas från Platsbanken vid nästa morgonkörning.</div></section>`;
+    const cat = p.get("cat") || "", lan = p.get("lan") || "", sek = p.get("sek") || "", st = p.get("st") || "open";
+    const q = (p.get("q") || "").toLowerCase();
+    const cats = [...new Set(jobs.flatMap(j => j.cat))].sort();
+    const byOrg = {}, byKey = {};
+    buyers.forEach(b => { if (b.o) byOrg[b.o] = b; byKey[b.k] = b; });
+    const openByBuyer = {};
+    open.forEach(n => { if (n.bk) openByBuyer[n.bk] = (openByBuyer[n.bk] || 0) + 1; });
+    let list = jobs.filter(j => (st === "all" || j.open) && (!cat || j.cat.includes(cat)) && (!lan || j.l === lan)
+      && (!sek || (sek === "off" ? j.pub : !j.pub))
+      && (!q || `${j.t} ${j.e} ${j.m || ""} ${j.occ || ""}`.toLowerCase().includes(q)));
+    const opt = (v, cur, label) => `<option value="${esc(v)}"${v === cur ? " selected" : ""}>${esc(label)}</option>`;
+    const newCount = jobs.filter(j => j.open && j.first >= new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10)).length;
+    const pubCount = jobs.filter(j => j.open && j.pub).length;
+    const items = list.slice(0, 250).map(j => {
+      const b = (j.eo && byOrg[j.eo]) || byKey[j.ek];
+      const ob = b ? openByBuyer[b.k] || 0 : 0;
+      const dl = daysLeft(j.d);
+      const stamp = !j.open ? `<span class="stamp done">Avslutad</span>` : (dl != null && dl >= 0 ? `<span class="stamp${dl <= 7 ? " urgent" : ""}">${dl === 0 ? "Sista dag i dag" : dl + " dagar kvar"}</span>` : "");
+      const meta = [
+        b ? `<a href="#/k/${encodeURIComponent(b.k)}">${esc(j.e)}</a>` : esc(j.e),
+        esc(j.cat.join(", ")),
+        esc([j.m, j.l].filter(Boolean).join(", ")),
+        j.et ? esc(j.et) : "",
+        `publ. ${fdate(j.p || j.first)}`
+      ].filter(Boolean).map(x => `<span>${x}</span>`).join("");
+      const link = b ? `<div class="win">${ob ? `<b>${ob} öppna upphandlingar</b> hos samma organisation · ` : ""}<a href="#/k/${encodeURIComponent(b.k)}">köparprofil</a>${b.res ? ` · ${b.res} avgjorda` : ""}</div>` : "";
+      return `<li><a class="row-t" href="${esc(j.u)}" target="_blank" rel="noopener">${esc(j.t)}</a>
+        <div class="row-side">${stamp}<span class="note">${j.pub ? "Offentlig" : "Privat"}</span></div>
+        <div class="row-meta">${meta}</div>${link}</li>`;
+    }).join("");
+    return `<section><span class="eyebrow">Behovsradar · Platsbanken</span><h1>Vem rekryterar säkerhet just nu?</h1>
+        <p class="lead">Organisationer som söker personal inom säkerhet, beredskap, dataskydd och risk har ett behov nu. Ofta behövs stöd innan tjänsten är tillsatt.</p></section>
+      <div class="stats"><div><b>${n0(jobs.filter(j => j.open).length)}</b><span>aktuella annonser</span></div><div><b>${n0(newCount)}</b><span>nya senaste 7 dagarna</span></div><div><b>${n0(pubCount)}</b><span>i offentlig sektor</span></div><div><b>${jmeta && jmeta.updatedAt ? fdate(jmeta.updatedAt.slice(0, 10)) : "–"}</b><span>senast hämtat</span></div></div>
+      <section>
+        <form id="sigform" class="filters">
+          <input type="search" id="sq" name="q" value="${esc(q)}" placeholder="Arbetsgivare, ort eller titel" aria-label="Sök">
+          <select id="scat" name="cat" aria-label="Kategori"><option value="">Alla kategorier</option>${cats.map(c => opt(c, cat, c)).join("")}</select>
+          <select id="slan" name="lan" aria-label="Län"><option value="">Alla län</option>${LAN.map(l => opt(l, lan, l)).join("")}</select>
+          <select id="ssek" name="sek" aria-label="Sektor">${opt("", sek, "Alla sektorer")}${opt("off", sek, "Offentlig")}${opt("priv", sek, "Privat")}</select>
+          <select id="sst" name="st" aria-label="Status">${opt("open", st, "Aktuella")}${opt("all", st, "Även avslutade")}</select>
+        </form>
+        <p class="note">${n0(list.length)} annonser. Sektor gissas utifrån arbetsgivarens namn. Länk till köparprofil visas när arbetsgivaren också upphandlar via TED.</p>
+      </section>
+      ${items ? `<ol class="rows">${items}</ol>` : `<div class="empty">Inga annonser matchar filtret.</div>`}`;
+  }
+
   // ---------- bevakningar (lokala i webbläsaren + standard från watches.json) ----------
   function matchW(n, w) {
     const text = `${n.t} ${n.b || ""} ${n.ds || ""}`.toLowerCase();
@@ -369,6 +419,7 @@
       else if (a === "leverantorer") html = await viewSuppliers(params);
       else if (a === "l" && b) html = await viewSupplier(b);
       else if (a === "bevakning") html = await viewWatch();
+      else if (a === "signaler") html = await viewSignals(params);
       else html = `<div class="empty">Sidan finns inte. <a href="#/">Till översikten</a></div>`;
     } catch (e) {
       console.error(e);
@@ -395,6 +446,12 @@
       const apply = () => { const d = Object.fromEntries(new FormData(filters)); if (d.st === "open") delete d.st; if (d.sort === "pub") delete d.sort; go("sok", d); };
       filters.addEventListener("change", apply);
       filters.addEventListener("submit", e => { e.preventDefault(); apply(); });
+    }
+    const sigform = document.getElementById("sigform");
+    if (sigform) {
+      const apply = () => { const d = Object.fromEntries(new FormData(sigform)); if (d.st === "open") delete d.st; go("signaler", d); };
+      sigform.addEventListener("change", apply);
+      sigform.addEventListener("submit", e => { e.preventDefault(); apply(); });
     }
     const lform = document.getElementById("lform");
     if (lform) lform.addEventListener("submit", e => { e.preventDefault(); go(a, { q: document.getElementById("lq").value.trim() }); });

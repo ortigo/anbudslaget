@@ -44,6 +44,14 @@ jobs:
           mkdir -p data
           python scripts/fetch_ted.py 2>&1 | tee data/last-run.log
 
+      - name: Hämta rekryteringssignaler (Platsbanken)
+        continue-on-error: true
+        env:
+          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+        run: |
+          set -o pipefail
+          python scripts/fetch_jobs.py 2>&1 | tee data/jobs-run.log
+
       - name: Spara felrapport
         if: failure()
         run: |
@@ -72,7 +80,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh issue create \
-            --title "Nya bevakningsträffar $(date -u +%Y-%m-%d)" \
+            --title "Nya träffar och signaler $(date -u +%Y-%m-%d)" \
             --body-file digest.md \
             --assignee "${{ github.repository_owner }}"
 

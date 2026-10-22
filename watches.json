@@ -7,5 +7,9 @@
   {"name": "Underrättelse och omvärldsanalys", "terms": ["underrättelse", "omvärldsanalys", "omvärldsbevakning", "osint", "hotbild"]},
   {"name": "Utbildning och övning", "terms": ["krisövning", "övningsledning", "säkerhetsutbildning", "utbildning i säkerhet", "spelövning", "krisledningsövning", "scenarioövning", "table top", "tabletop", "beredskapsövning", "ledningsövning"]},
   {"name": "Konsultförsörjning", "terms": ["konsultförsörjning", "managementkonsult", "it-konsult", "verksamhetskonsult", "ramavtal konsult", "it-konsulter", "konsulttjänster it", "it-tjänster konsult"], "cpv": ["7941", "7222"]},
-  {"name": "Ledarskap och coaching", "terms": ["ledarskap", "ledarutveckling", "ledarskapsutbildning", "chefsträning", "chefsutveckling", "chefsutbildning", "chefsstöd", "coaching", "coach", "mentorskap", "coachning"]}
+  {"name": "Ledarskap och coaching", "terms": ["ledarskap", "ledarutveckling", "ledarskapsutbildning", "chefsträning", "chefsutveckling", "chefsutbildning", "chefsstöd", "coaching", "coach", "mentorskap", "coachning"]},
+  {"name": "DY: Samtals- och krisstöd", "terms": ["samtalsstöd", "krisstöd", "psykosocialt stöd", "debriefing", "kristerapi", "stödsamtal", "krisbearbetning", "efter kris", "posttraumatisk"]},
+  {"name": "DY: Psykologi och terapi", "terms": ["psykolog", "psykoterapi", "samtalsterapeut", "beteendevetare", "kbt", "kognitiv beteendeterapi", "samtalsbehandling", "familjebehandling", "parterapi"]},
+  {"name": "DY: Handledning och personalstöd", "terms": ["handledning", "arbetshandledning", "processhandledning", "grupphandledning", "personalstöd", "medarbetarstöd", "företagshälsovård", "rehabiliteringsstöd", "stresshantering"]},
+  {"name": "DY: Chefs- och ledarskapscoachning", "terms": ["chefscoachning", "chefscoaching", "ledarskapscoachning", "executive coaching", "ledarutveckling", "chefsutveckling", "grupputveckling", "teamutveckling", "organisationsutveckling"]}
 ]
