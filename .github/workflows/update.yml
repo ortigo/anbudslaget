@@ -52,6 +52,12 @@ jobs:
           set -o pipefail
           python scripts/fetch_jobs.py 2>&1 | tee data/jobs-run.log
 
+      - name: Hämta nyckeltal (Kolada)
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python scripts/fetch_kolada.py 2>&1 | tee data/kolada-run.log
+
       - name: Spara felrapport
         if: failure()
         run: |

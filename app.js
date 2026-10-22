@@ -336,6 +336,86 @@
       ${items ? `<ol class="rows">${items}</ol>` : `<div class="empty">Inga annonser matchar filtret.</div>`}`;
   }
 
+  // ---------- kundkort (Kolada + upphandlingar + signaler) ----------
+  const LANKOD = {"01":"Stockholms län","03":"Uppsala län","04":"Södermanlands län","05":"Östergötlands län","06":"Jönköpings län","07":"Kronobergs län","08":"Kalmar län","09":"Gotlands län","10":"Blekinge län","12":"Skåne län","13":"Hallands län","14":"Västra Götalands län","17":"Värmlands län","18":"Örebro län","19":"Västmanlands län","20":"Dalarnas län","21":"Gävleborgs län","22":"Västernorrlands län","23":"Jämtlands län","24":"Västerbottens län","25":"Norrbottens län"};
+  const slugify = s => (s || "").toLowerCase().replace(/å|ä/g, "a").replace(/ö/g, "o").replace(/é/g, "e").replace(/ü/g, "u").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const muniLan = m => m.ty === "L" ? LANKOD[m.id.slice(2)] : LANKOD[m.id.slice(0, 2)];
+  function orgKeys(m) {
+    const t = slugify(m.t);
+    if (m.ty === "L") return [t];
+    const gen = t.endsWith("s") ? t : t + "s";
+    return [t + "-kommun", gen + "-kommun", t + "-stad", gen + "-stad", "kommunstyrelsen-i-" + t];
+  }
+  const matchesOrg = (key, keys) => !!key && keys.some(k => key === k || key.startsWith(k + "-"));
+  function fmtKpi(v, title) {
+    if (v == null) return "–";
+    const pct = /%/.test(title || "");
+    const dec = pct || Math.abs(v) < 100 ? 1 : 0;
+    return v.toLocaleString("sv-SE", { maximumFractionDigits: dec, minimumFractionDigits: pct ? 1 : 0 }) + (pct ? " %" : "");
+  }
+
+  async function viewCards(p) {
+    const k = await load("kolada");
+    if (!k || !k.munis) return `<section><h1>Kundkort</h1><div class="empty">Nyckeltal från Kolada hämtas vid nästa morgonkörning.</div></section>`;
+    const q = (p.get("q") || "").toLowerCase(), lan = p.get("lan") || "Skåne län", ty = p.get("ty") || "";
+    const [open, jobs] = await Promise.all([load("open"), load("jobs")]);
+    const list = k.munis.filter(m => m.id !== "0000" && (!lan || lan === "alla" || muniLan(m) === lan) && (!ty || m.ty === ty) && (!q || m.t.toLowerCase().includes(q)));
+    const opt = (v, cur, label) => `<option value="${esc(v)}"${v === cur ? " selected" : ""}>${esc(label)}</option>`;
+    const rowsH = list.map(m => {
+      const keys = orgKeys(m);
+      const o = open.filter(n => matchesOrg(n.bk, keys)).length;
+      const j = jobs.filter(x => x.open && matchesOrg(x.ek, keys)).length;
+      const inv = ((k.values[m.id] || {}).N01951 || []).slice(-1)[0];
+      return `<tr><td><a href="#/kort/${m.id}">${esc(m.ty === "L" ? m.t : m.t + " kommun")}</a></td><td class="n">${inv ? n0(inv[1]) : ""}</td><td class="n">${o || ""}</td><td class="n">${j || ""}</td></tr>`;
+    }).join("");
+    return `<section><span class="eyebrow">Kolada · TED · Platsbanken</span><h1>Kundkort</h1>
+      <p class="lead">En sida per kommun och region med nyckeltal, upphandlingar, vinnare och pågående rekryteringar. Underlag inför möten.</p>
+      <form id="cardform" class="filters">
+        <input type="search" id="cq" name="q" value="${esc(q)}" placeholder="Kommun eller region" aria-label="Sök">
+        <select id="clan" name="lan" aria-label="Län">${opt("alla", lan, "Hela landet")}${LAN.map(l => opt(l, lan, l)).join("")}</select>
+        <select id="cty" name="ty" aria-label="Typ">${opt("", ty, "Kommuner och regioner")}${opt("K", ty, "Kommuner")}${opt("L", ty, "Regioner")}</select>
+      </form></section>
+      <div class="table-wrap"><table><thead><tr><th>Organisation</th><th class="n">Invånare</th><th class="n">Öppna upph.</th><th class="n">Rekryterar</th></tr></thead><tbody>${rowsH}</tbody></table></div>`;
+  }
+
+  async function viewCard(id) {
+    const [k, open, buyers, suppliers, jobs, all] = await Promise.all([load("kolada"), load("open"), load("buyers"), load("suppliers"), load("jobs"), archive()]);
+    const m = k && k.munis && k.munis.find(x => x.id === id);
+    if (!m) return `<div class="empty">Hittar inte kommunen eller regionen.</div>`;
+    const name = m.ty === "L" ? m.t : m.t + " kommun";
+    const keys = orgKeys(m);
+    const vals = k.values[m.id] || {}, riket = k.values["0000"] || {};
+    const kpiRows = (k.kpis[m.ty] || []).filter(kid => k.meta[kid]).map(kid => {
+      const me = k.meta[kid], s = vals[kid] || [], last = s[s.length - 1], prev = s[s.length - 2];
+      const r = (riket[kid] || []).find(x => last && x[0] === last[0]) || (riket[kid] || []).slice(-1)[0];
+      const trend = last && prev ? (last[1] > prev[1] ? "↑" : last[1] < prev[1] ? "↓" : "→") : "";
+      return `<tr><td><b>${esc(me.short)}</b><div class="note">${esc(me.title)}</div></td>
+        <td class="n">${fmtKpi(last && last[1], me.title)} <span class="muted">${trend}</span></td>
+        <td class="n">${last ? last[0] : ""}</td>
+        <td class="n">${kid === "N01951" || kid === "N00231" ? "" : fmtKpi(r && r[1], me.title)}</td></tr>`;
+    }).join("");
+    const mine = all.filter(n => matchesOrg(n.bk, keys));
+    const openN = open.filter(n => matchesOrg(n.bk, keys)).sort((a, b) => (b.p || "").localeCompare(a.p || ""));
+    const res = mine.filter(n => n.r).sort((a, b) => (b.p || "").localeCompare(a.p || ""));
+    const wins = {};
+    res.forEach(n => (n.w || []).forEach(w => { wins[w.k] = wins[w.k] || { n: w.n, c: 0 }; wins[w.k].c++; }));
+    const topW = Object.entries(wins).sort((a, b) => b[1].c - a[1].c).slice(0, 8);
+    const units = buyers.filter(b => matchesOrg(b.k, keys));
+    const bids = res.filter(n => n.nb != null).map(n => n.nb);
+    const avgBids = bids.length ? (bids.reduce((a, b) => a + b, 0) / bids.length).toFixed(1).replace(".", ",") : "–";
+    const sig = jobs.filter(x => matchesOrg(x.ek, keys)).sort((a, b) => b.open - a.open || (b.p || "").localeCompare(a.p || ""));
+    return `<section><span class="eyebrow">${m.ty === "L" ? "Region" : "Kommun"} · ${esc(muniLan(m) || "")} · Kolada-id <span class="mono">${esc(m.id)}</span></span><h1>${esc(name)}</h1></section>
+      <div class="stats"><div><b>${openN.length}</b><span>öppna upphandlingar</span></div><div><b>${res.length}</b><span>avgjorda senaste året</span></div><div><b>${avgBids}</b><span>anbud i snitt</span></div><div><b>${sig.filter(x => x.open).length}</b><span>rekryteringar inom säkerhet</span></div></div>
+      <section><h2>Nyckeltal</h2><div class="table-wrap"><table><thead><tr><th>Mått</th><th class="n">Värde</th><th class="n">År</th><th class="n">Riket</th></tr></thead><tbody>${kpiRows || `<tr><td colspan="4" class="muted">Inga nyckeltal hämtade.</td></tr>`}</tbody></table></div>
+        <p class="note">Källa: Kolada (RKA). Pilen visar förändring mot föregående år. Hämtat ${esc((k.updatedAt || "").slice(0, 10))}.</p></section>
+      ${sig.length ? `<section><h2>Rekryterar inom säkerhet och beredskap</h2><ol class="rows">${sig.slice(0, 10).map(j => `<li><a class="row-t" href="${esc(j.u)}" target="_blank" rel="noopener">${esc(j.t)}</a><div class="row-side">${j.open ? "" : `<span class="stamp done">Avslutad</span>`}</div><div class="row-meta"><span>${esc(j.e)}</span><span>${esc(j.cat.join(", "))}</span><span>publ. ${fdate(j.p || j.first)}</span></div></li>`).join("")}</ol></section>` : ""}
+      ${topW.length ? `<section><h2>Vinner oftast här</h2><div class="table-wrap"><table><tbody>${topW.map(([key, w]) => `<tr><td><a href="#/l/${encodeURIComponent(key)}">${esc(w.n)}</a></td><td class="n">${w.c} vinster</td></tr>`).join("")}</tbody></table></div></section>` : ""}
+      <section><h2>Öppna upphandlingar</h2>${rows(openN, "Inga öppna upphandlingar i TED just nu.")}</section>
+      <section><h2>Senast avgjorda</h2>${rows(res.slice(0, 12), "Inga avgjorda upphandlingar i arkivet.")}</section>
+      ${units.length > 1 ? `<section><h2>Köparenheter</h2><div class="chips">${units.map(b => `<a class="chip" href="#/k/${encodeURIComponent(b.k)}">${esc(b.n)}</a>`).join("")}</div></section>` : ""}
+      <p class="note">Upphandlingar och rekryteringar kopplas via organisationens namn och kan i enstaka fall missa bolag eller förbund som kommunen äger.</p>`;
+  }
+
   // ---------- bevakningar (lokala i webbläsaren + standard från watches.json) ----------
   function matchW(n, w) {
     const text = `${n.t} ${n.b || ""} ${n.ds || ""}`.toLowerCase();
@@ -420,6 +500,8 @@
       else if (a === "l" && b) html = await viewSupplier(b);
       else if (a === "bevakning") html = await viewWatch();
       else if (a === "signaler") html = await viewSignals(params);
+      else if (a === "kort" && b) html = await viewCard(b);
+      else if (a === "kort") html = await viewCards(params);
       else html = `<div class="empty">Sidan finns inte. <a href="#/">Till översikten</a></div>`;
     } catch (e) {
       console.error(e);
@@ -446,6 +528,12 @@
       const apply = () => { const d = Object.fromEntries(new FormData(filters)); if (d.st === "open") delete d.st; if (d.sort === "pub") delete d.sort; go("sok", d); };
       filters.addEventListener("change", apply);
       filters.addEventListener("submit", e => { e.preventDefault(); apply(); });
+    }
+    const cardform = document.getElementById("cardform");
+    if (cardform) {
+      const apply = () => { const d = Object.fromEntries(new FormData(cardform)); if (d.lan === "Skåne län") delete d.lan; go("kort", d); };
+      cardform.addEventListener("change", apply);
+      cardform.addEventListener("submit", e => { e.preventDefault(); apply(); });
     }
     const sigform = document.getElementById("sigform");
     if (sigform) {
