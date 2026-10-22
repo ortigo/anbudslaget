@@ -29,9 +29,9 @@ jobs:
     environment:
       name: github-pages
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -39,7 +39,18 @@ jobs:
         env:
           BACKFILL_MONTHS: ${{ github.event.inputs.backfill_months || '12' }}
           SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
-        run: python scripts/fetch_ted.py
+        run: |
+          set -o pipefail
+          mkdir -p data
+          python scripts/fetch_ted.py 2>&1 | tee data/last-run.log
+
+      - name: Spara felrapport
+        if: failure()
+        run: |
+          git config user.name "anbudslaget-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/last-run.log
+          git commit -m "Felrapport $(date -u +%Y-%m-%dT%H:%M)" && git push
 
       - name: Spara ändringar
         run: |
