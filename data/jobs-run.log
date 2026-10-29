@@ -1,29 +1,15 @@
-  beredskap: 461 träffar i fritext
-  ciso: 23 träffar i fritext
-  civilt försvar: 382 träffar i fritext
-  cybersäkerhet: 128 träffar i fritext
-  dataskydd: 94 träffar i fritext
-  dataskyddsombud: 8 träffar i fritext
-  gdpr: 295 träffar i fritext
-  informationssäkerhet: 319 träffar i fritext
-  informationssäkerhetssamordnare: 26 träffar i fritext
-  it-säkerhet: 170 träffar i fritext
-  kontinuitet: 1036 träffar i fritext
-  krisberedskap: 54 träffar i fritext
-  krishantering: 34 träffar i fritext
-  risk manager: 9 träffar i fritext
-  riskanalytiker: 0 träffar i fritext
-  riskchef: 0 träffar i fritext
-  riskhantering: 349 träffar i fritext
-  security: 595 träffar i fritext
-  soc-analytiker: 0 träffar i fritext
-  säkerhetsansvarig: 1 träffar i fritext
-  säkerhetsarkitekt: 0 träffar i fritext
-  säkerhetschef: 17 träffar i fritext
-  säkerhetshandläggare: 61 träffar i fritext
-  säkerhetssamordnare: 61 träffar i fritext
-  säkerhetsskydd: 529 träffar i fritext
-  säkerhetsspecialist: 33 träffar i fritext
-  säkerhetsstrateg: 3 träffar i fritext
-  totalförsvar: 59 träffar i fritext
-Behovsradar klar: 243 aktuella annonser, 17 nya.
+Traceback (most recent call last):
+  File "/home/runner/work/anbudslaget/anbudslaget/scripts/fetch_jobs.py", line 180, in <module>
+    main()
+  File "/home/runner/work/anbudslaget/anbudslaget/scripts/fetch_jobs.py", line 133, in main
+    res = get({"q": term, "limit": 100, "offset": offset})
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/anbudslaget/anbudslaget/scripts/fetch_jobs.py", line 51, in get
+    return json.loads(r.read().decode("utf-8"))
+                      ^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/http/client.py", line 510, in read
+    s = self._safe_read(self.length)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/http/client.py", line 684, in _safe_read
+    raise IncompleteRead(data.getvalue(), amt - data.tell())
+http.client.IncompleteRead: IncompleteRead(1505352 bytes read, 1712 more expected)
