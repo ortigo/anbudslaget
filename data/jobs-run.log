@@ -1,15 +1,29 @@
-Traceback (most recent call last):
-  File "/home/runner/work/anbudslaget/anbudslaget/scripts/fetch_jobs.py", line 180, in <module>
-    main()
-  File "/home/runner/work/anbudslaget/anbudslaget/scripts/fetch_jobs.py", line 133, in main
-    res = get({"q": term, "limit": 100, "offset": offset})
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/anbudslaget/anbudslaget/scripts/fetch_jobs.py", line 51, in get
-    return json.loads(r.read().decode("utf-8"))
-                      ^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/http/client.py", line 510, in read
-    s = self._safe_read(self.length)
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/http/client.py", line 684, in _safe_read
-    raise IncompleteRead(data.getvalue(), amt - data.tell())
-http.client.IncompleteRead: IncompleteRead(1505352 bytes read, 1712 more expected)
+  beredskap: 476 träffar i fritext
+  ciso: 20 träffar i fritext
+  civilt försvar: 416 träffar i fritext
+  cybersäkerhet: 131 träffar i fritext
+  dataskydd: 99 träffar i fritext
+  dataskyddsombud: 9 träffar i fritext
+  gdpr: 301 träffar i fritext
+  informationssäkerhet: 317 träffar i fritext
+  informationssäkerhetssamordnare: 24 träffar i fritext
+  it-säkerhet: 195 träffar i fritext
+  kontinuitet: 1064 träffar i fritext
+  krisberedskap: 65 träffar i fritext
+  krishantering: 36 träffar i fritext
+  risk manager: 9 träffar i fritext
+  riskanalytiker: 0 träffar i fritext
+  riskchef: 0 träffar i fritext
+  riskhantering: 358 träffar i fritext
+  security: 618 träffar i fritext
+  soc-analytiker: 0 träffar i fritext
+  säkerhetsansvarig: 1 träffar i fritext
+  säkerhetsarkitekt: 0 träffar i fritext
+  säkerhetschef: 19 träffar i fritext
+  säkerhetshandläggare: 68 träffar i fritext
+  säkerhetssamordnare: 70 träffar i fritext
+  säkerhetsskydd: 545 träffar i fritext
+  säkerhetsspecialist: 37 träffar i fritext
+  säkerhetsstrateg: 2 träffar i fritext
+  totalförsvar: 60 träffar i fritext
+Behovsradar klar: 244 aktuella annonser, 24 nya.
