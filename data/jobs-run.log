@@ -1,29 +1,25 @@
-  beredskap: 484 träffar i fritext
+  beredskap: 500 träffar i fritext
   ciso: 22 träffar i fritext
-  civilt försvar: 394 träffar i fritext
-  cybersäkerhet: 157 träffar i fritext
-  dataskydd: 92 träffar i fritext
+  civilt försvar: 396 träffar i fritext
+  cybersäkerhet: 160 träffar i fritext
+  dataskydd: 91 träffar i fritext
   dataskyddsombud: 4 träffar i fritext
-  gdpr: 309 träffar i fritext
-  informationssäkerhet: 317 träffar i fritext
+  gdpr: 312 träffar i fritext
+  informationssäkerhet: 328 träffar i fritext
   informationssäkerhetssamordnare: 28 träffar i fritext
-  it-säkerhet: 180 träffar i fritext
-  kontinuitet: 967 träffar i fritext
-  krisberedskap: 58 träffar i fritext
-  krishantering: 53 träffar i fritext
-  risk manager: 8 träffar i fritext
-  riskanalytiker: 2 träffar i fritext
-  riskchef: 0 träffar i fritext
-  riskhantering: 377 träffar i fritext
-  security: 700 träffar i fritext
-  soc-analytiker: 0 träffar i fritext
-  säkerhetsansvarig: 1 träffar i fritext
-  säkerhetsarkitekt: 0 träffar i fritext
-  säkerhetschef: 11 träffar i fritext
-  säkerhetshandläggare: 64 träffar i fritext
-  säkerhetssamordnare: 57 träffar i fritext
-  säkerhetsskydd: 505 träffar i fritext
-  säkerhetsspecialist: 27 träffar i fritext
-  säkerhetsstrateg: 3 träffar i fritext
-  totalförsvar: 48 träffar i fritext
-Behovsradar klar: 260 aktuella annonser, 10 nya.
+  it-säkerhet: 187 träffar i fritext
+Traceback (most recent call last):
+  File "/home/runner/work/anbudslaget/anbudslaget/scripts/fetch_jobs.py", line 180, in <module>
+    main()
+  File "/home/runner/work/anbudslaget/anbudslaget/scripts/fetch_jobs.py", line 133, in main
+    res = get({"q": term, "limit": 100, "offset": offset})
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/anbudslaget/anbudslaget/scripts/fetch_jobs.py", line 51, in get
+    return json.loads(r.read().decode("utf-8"))
+                      ^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/http/client.py", line 510, in read
+    s = self._safe_read(self.length)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/http/client.py", line 684, in _safe_read
+    raise IncompleteRead(data.getvalue(), amt - data.tell())
+http.client.IncompleteRead: IncompleteRead(1475511 bytes read, 12774 more expected)
